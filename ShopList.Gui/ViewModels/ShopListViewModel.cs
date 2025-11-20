@@ -1,17 +1,78 @@
-﻿using System.Collections.ObjectModel;
-using ShopList.Gui.Models;
+﻿using ShopList.Gui.Models;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Input;
 
 namespace ShopList.Gui.ViewModels
 {
-    public class ShopListViewModel
+    public class ShopListViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<ShopListItem> ShopList { get; }
-        public ShopListViewModel()
+
+
+        private string _nombreDelArticulo = string.Empty;
+        private int _cantidad = 1;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string NombreDelArticulo
         {
-           ShopList = new ObservableCollection<ShopListItem>();
-            CargarDatos();
+            get => _nombreDelArticulo;
+            set
+            {
+                if (_nombreDelArticulo != value)
+                {
+                    _nombreDelArticulo = value;
+                    OnPropertyChanged(nameof(NombreDelArticulo));
+                }
+            }
         }
 
+        public int Cantidad
+        {
+            get => _cantidad;
+            set
+            {
+                if (_cantidad != value)
+                {
+                    _cantidad = value;
+                    OnPropertyChanged(nameof(Cantidad));
+                }
+            }
+
+        }
+
+
+        public ObservableCollection<ShopListItem> ShopList { get; }
+
+        public ICommand AddShopListItem
+        {
+            get; private set;
+        }
+        public ShopListViewModel()
+        {
+            ShopList = new ObservableCollection<ShopListItem>();
+            CargarDatos();
+            AddShopListItemCommand = new Command(AddShopListItem);
+        }
+
+        public void AddShopListItem()
+        {
+            if (string.IsNullOrEmpty(NombreDelArticulo) && _cantidad <= 0)
+            {
+                return;
+            }
+            Random generador = new Random();
+            var item = new ShopListItem()
+            {
+                Id = generador.Next(),
+                Nombre = NombreDelArticulo,
+                Cantidad = this._cantidad,
+                Comprado = false,
+            };
+            ShopList.Add(item);
+            NombreDelArticulo = string.Empty;
+            Cantidad = 1;
+        }
         private void CargarDatos()
         {
             ShopList.Add(new ShopListItem()
@@ -21,6 +82,7 @@ namespace ShopList.Gui.ViewModels
                 Cantidad = 1,
                 Comprado = false,
             });
+
             ShopList.Add(new ShopListItem()
             {
                 Id = 2,
@@ -28,6 +90,7 @@ namespace ShopList.Gui.ViewModels
                 Cantidad = 3,
                 Comprado = false,
             });
+
             ShopList.Add(new ShopListItem()
             {
                 Id = 3,
@@ -36,5 +99,14 @@ namespace ShopList.Gui.ViewModels
                 Comprado = false,
             });
         }
+
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(propertyName));
+        }
     }
+
 }
