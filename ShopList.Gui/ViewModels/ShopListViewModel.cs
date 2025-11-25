@@ -1,63 +1,47 @@
-﻿using ShopList.Gui.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ShopList.Gui.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 
 namespace ShopList.Gui.ViewModels
 {
-    public class ShopListViewModel : INotifyPropertyChanged
+    public partial class ShopListViewModel : ObservableObject
     {
+        [ObservableProperty]
+        private string _NombreDelArticulo = string.Empty;
+        [ObservableProperty]
+        private int _Cantidad = 1;
+        [ObservableProperty]
 
-
-        private string _nombreDelArticulo = string.Empty;
-        private int _cantidad = 1;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public string NombreDelArticulo
-        {
-            get => _nombreDelArticulo;
-            set
-            {
-                if (_nombreDelArticulo != value)
-                {
-                    _nombreDelArticulo = value;
-                    OnPropertyChanged(nameof(NombreDelArticulo));
-                }
-            }
-        }
-
-        public int Cantidad
-        {
-            get => _cantidad;
-            set
-            {
-                if (_cantidad != value)
-                {
-                    _cantidad = value;
-                    OnPropertyChanged(nameof(Cantidad));
-                }
-            }
-
-        }
-
+        private ShopListItem? _elementoSeleccionado = null;
 
         public ObservableCollection<ShopListItem> ShopList { get; }
 
-        public ICommand AddShopListItem
-        {
-            get; private set;
-        }
         public ShopListViewModel()
         {
             ShopList = new ObservableCollection<ShopListItem>();
             CargarDatos();
-            AddShopListItemCommand = new Command(AddShopListItem);
-        }
+            { }
+            if (ShopList.Count > 0)
+            { ElementoSeleccionado = ShopList[0];
+                {
+                    ElementoSeleccionado = ShopList[0];
+                }
+                else
+                {
+                    ElementoSeleccionado = null;
+                }
+            }
 
-        public void AddShopListItem()
+          
+        
+        
+        [RelayCommand]
+            public void AddShopListItem()
         {
-            if (string.IsNullOrEmpty(NombreDelArticulo) && _cantidad <= 0)
+            if (string.IsNullOrEmpty(NombreDelArticulo) && Cantidad <= 0)
             {
                 return;
             }
@@ -66,13 +50,47 @@ namespace ShopList.Gui.ViewModels
             {
                 Id = generador.Next(),
                 Nombre = NombreDelArticulo,
-                Cantidad = this._cantidad,
-                Comprado = false,
+                Cantidad = this.Cantidad,
+                Comprado = false
             };
+
             ShopList.Add(item);
+                ElementoSeleccionado = item;
             NombreDelArticulo = string.Empty;
-            Cantidad = 1;
+                Cantidad = 1;
         }
+            [RelayCommand]
+        public void RemoveShopListItem()
+           
+                if (ElementoSeleccionado == null)
+                {
+                    return;
+                }
+                ShopListItem? nuevoElementoSeleccionado;
+            int indice = ShopList.IndexOf(ElementoSeleccionado);
+            if (ShopList.Count > 1)
+            {
+                if (indice == ShopList.Count - 1)
+                {
+                    // Es el ultimo elemento
+                    nuevoElementoSeleccionado = ShopList[indice - 1];
+                }
+                else
+                {
+                    // No es el ultimo elemento
+                    nuevoElementoSeleccionado = ShopList[Indice + 1];
+                }
+            }
+            else
+            {
+                    //Es el unico elemento
+                    nuevoElementoSeleccionado = null;
+                }
+            ShopList.Remove(ElementoSeleccionado);
+            ElementoSeleccionado = nuevoElementoSeleccionado;
+            }
+            
+         
         private void CargarDatos()
         {
             ShopList.Add(new ShopListItem()
@@ -100,13 +118,6 @@ namespace ShopList.Gui.ViewModels
             });
         }
 
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs(propertyName));
-        }
+        
     }
-
 }
