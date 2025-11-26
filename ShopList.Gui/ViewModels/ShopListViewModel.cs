@@ -14,7 +14,6 @@ namespace ShopList.Gui.ViewModels
         [ObservableProperty]
         private int _Cantidad = 1;
         [ObservableProperty]
-
         private ShopListItem? _elementoSeleccionado = null;
 
         public ObservableCollection<ShopListItem> ShopList { get; }
@@ -23,25 +22,21 @@ namespace ShopList.Gui.ViewModels
         {
             ShopList = new ObservableCollection<ShopListItem>();
             CargarDatos();
-            { }
             if (ShopList.Count > 0)
-            { ElementoSeleccionado = ShopList[0];
-                {
-                    ElementoSeleccionado = ShopList[0];
-                }
-                else
-                {
-                    ElementoSeleccionado = null;
-                }
+            {
+                ElementoSeleccionado = ShopList[0];
+            }
+            else
+            {
+                ElementoSeleccionado = null;
             }
 
-          
-        
-        
+
+        }
         [RelayCommand]
-            public void AddShopListItem()
+        public void AddShopListItem()
         {
-            if (string.IsNullOrEmpty(NombreDelArticulo) && Cantidad <= 0)
+            if (string.IsNullOrEmpty(NombreDelArticulo) || Cantidad <= 0)
             {
                 return;
             }
@@ -55,42 +50,38 @@ namespace ShopList.Gui.ViewModels
             };
 
             ShopList.Add(item);
-                ElementoSeleccionado = item;
+            ElementoSeleccionado = item;
             NombreDelArticulo = string.Empty;
-                Cantidad = 1;
+            Cantidad = 1;
         }
-            [RelayCommand]
+        [RelayCommand]
         public void RemoveShopListItem()
-           
-                if (ElementoSeleccionado == null)
-                {
-                    return;
-                }
-                ShopListItem? nuevoElementoSeleccionado;
+        {
+            if (ElementoSeleccionado == null)
+            {
+                return;
+            }
+            ShopListItem? nuevoElementoSeleccionado;
             int indice = ShopList.IndexOf(ElementoSeleccionado);
             if (ShopList.Count > 1)
             {
                 if (indice == ShopList.Count - 1)
                 {
-                    // Es el ultimo elemento
                     nuevoElementoSeleccionado = ShopList[indice - 1];
                 }
                 else
                 {
-                    // No es el ultimo elemento
-                    nuevoElementoSeleccionado = ShopList[Indice + 1];
+                    nuevoElementoSeleccionado = ShopList[indice + 1];
                 }
             }
             else
             {
-                    //Es el unico elemento
-                    nuevoElementoSeleccionado = null;
-                }
+                nuevoElementoSeleccionado = null;
+            }
             ShopList.Remove(ElementoSeleccionado);
             ElementoSeleccionado = nuevoElementoSeleccionado;
-            }
-            
-         
+        }
+
         private void CargarDatos()
         {
             ShopList.Add(new ShopListItem()
@@ -117,7 +108,5 @@ namespace ShopList.Gui.ViewModels
                 Comprado = false,
             });
         }
-
-        
     }
 }
